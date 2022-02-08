@@ -1,0 +1,24 @@
+{
+    "name": "chern/pnss",
+    "autoload": {
+        "psr-4": {
+            "Chern\\Pnss\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "avguschr",
+            "email": "avguschr@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4 | ^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Src\\": "core/Src/",
+            "": "app/"
+        }
+    }
+    
+}
