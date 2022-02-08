@@ -1,16 +1,18 @@
 <?php
 
-namespace src;
+namespace Src;
 
 use Error;
 
-class App
+class Application
 {
     private Settings $settings;
+    private Route $route;
 
     public function __construct(Settings $settings)
     {
         $this->settings = $settings;
+        $this->route = new Route();
     }
 
     public function __get($key)
@@ -23,6 +25,8 @@ class App
 
     public function run(): void
     {
-        echo 'Working';
+        $this->route->setPrefix($this->settings->getRootPath());
+        $this->route->start();
     }
 }
+

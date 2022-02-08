@@ -1,10 +1,10 @@
 <?php
 return [
-    'root' => 'pnss',
+    'root' => '',
 
     'classes' => [
         'app',
-        'core'
+        'core',
     ],
 
     'routes' => 'routes',
