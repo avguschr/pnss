@@ -1,10 +1,5 @@
 {
     "name": "chern/pnss",
-    "autoload": {
-        "psr-4": {
-            "Chern\\Pnss\\": "src/"
-        }
-    },
     "authors": [
         {
             "name": "avguschr",
