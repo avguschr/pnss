@@ -11,11 +11,11 @@ class AdminMiddleware
     public function handle(Request $request)
     {
         if (!Auth::check()) {
-            app()->route->redirect('/login');
+            app()->route->redirect('/');
         }
         if(!Auth::user()->isAdmin())
         {
-            app()->route->redirect('/login');
+            app()->route->redirect('/');
         }
     }
 }

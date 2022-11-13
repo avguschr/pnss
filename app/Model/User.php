@@ -35,7 +35,7 @@ class User extends Model implements IdentityInterface
 
     public function isDoctor()
     {
-        if($this->role === 2)
+        if($this->role === 3)
         {
             return true;
         }
@@ -47,7 +47,7 @@ class User extends Model implements IdentityInterface
 
     public function isPatient()
     {
-        if($this->role === 3)
+        if($this->role === 2)
         {
             return true;
         }
@@ -64,9 +64,15 @@ class User extends Model implements IdentityInterface
         static::created(function ($user) {
             $user->password = md5($user->password);
             $user->save();
-            $patient = new Patient;
-            $patient->id = $user->id;
-            $patient->save();
+            if ($user->role === 2) {
+                $patient = new Patient;
+                $patient->id = $user->id;
+                $patient->save();
+            }
+//            if ($user->role === 3) {
+//                $doctor = new Doctor;
+//                $doctor->id = $user->id;
+//            }
         });
     }
 

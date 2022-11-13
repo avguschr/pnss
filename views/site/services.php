@@ -1,4 +1,5 @@
 <h1 class="text-center" style="margin-bottom: 100px">Услуги</h1>
+<a class="btn btn-primary mb-3" href="/add-service">Добавить услугу</a>
 <div>
     <?php
     foreach ($services as $s) {

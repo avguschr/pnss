@@ -9,4 +9,8 @@ class Service extends Model
 {
     use HasFactory;
     public $timestamps = false;
+    protected $fillable = [
+        'name',
+        'cost',
+    ];
 }

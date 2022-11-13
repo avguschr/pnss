@@ -12,6 +12,7 @@ use Src\Request;
 use Illuminate\Database\Capsule\Manager as DB;
 use Model\User;
 use Src\Auth\Auth;
+use Src\Validator\Validator;
 
 class Site
 {
@@ -21,24 +22,104 @@ class Site
         return (new View())->render('site.diagnosis', ['diagnosis' => $diagnosis]);
     }
 
-    public function hello(): string
-    {
-        return new View('site.hello', ['message' => 'hello working']);
-    }
-
     public function signup(Request $request): string
     {
-        if ($request->method==='POST' && User::create($request->all())){
-            app()->route->redirect('/login');
+        if ($request->method === 'POST') {
+
+            $validator = new Validator($request->all(), [
+                'name' => ['required', 'russianLanguage'],
+                'login' => ['required', 'unique:users,login', 'latin'],
+                'surname' => ['required', 'russianLanguage'],
+                'patronymic' => ['required', 'russianLanguage'],
+                'password' => ['required', 'latin'],
+                'birthday' => ['birthday']
+            ], [
+                'required' => 'Поле :field пусто',
+                'unique' => 'Поле :field должно быть уникально',
+                'birthday' => 'Поле :field содержит некорректную дату',
+                'russianLanguage' => 'Поле :field должно содержать только русские буквы',
+                'latin' => 'Поле :field должно содержать только латинские буквы и цифры'
+            ]);
+
+            if($validator->fails()){
+                return new View('site.signup',
+                    ['message' => json_encode($validator->errors(), JSON_UNESCAPED_UNICODE)]);
+            }
+
+            if (User::create($request->all())) {
+                app()->route->redirect('/login');
+            }
         }
         return new View('site.signup');
     }
 
+
+    public function addDoctor(Request $request): string {
+
+        if ($request->method==='POST') {
+            $validator = new Validator($request->all(), [
+                'name' => ['required', 'russianLanguage'],
+                'surname' => ['required', 'russianLanguage'],
+                'patronymic' => ['required', 'russianLanguage'],
+                'login' => ['required', 'unique:users,login', 'latin'],
+                'position' => ['required', 'russianLanguage'],
+                'specialization' => ['required', 'russianLanguage'],
+                'password' => ['required', 'latin'],
+                'birthday' => ['birthday']
+            ], [
+                'required' => 'Поле :field пусто',
+                'unique' => 'Поле :field должно быть уникально',
+                'birthday' => 'Поле :field содержит некорректную дату',
+                'russianLanguage' => 'Поле :field должно содержать только русские буквы',
+                'latin' => 'Поле :field должно содержать только латинские буквы и цифры'
+            ]);
+
+            if($validator->fails()){
+                return new View('site.addDoctor',
+                    ['message' => json_encode($validator->errors(), JSON_UNESCAPED_UNICODE)]);
+            }
+
+            $user = new User;
+            $user->login = $request->login;
+            $user->name = $request->name;
+            $user->surname = $request->surname;
+            $user->patronymic = $request->patronymic;
+            $user->birthday = $request->birthday;
+            $user->password = md5($request->password);
+            $user->role = 3;
+            $user->save();
+
+            $doctor = new Doctor;
+            $doctor->id = $user->id;
+            $doctor->position = $request->position;
+            $doctor->specialization = $request->specialization;
+            $doctor->save();
+
+            app()->route->redirect('/doctors');
+        }
+        return new View('site.addDoctor');
+    }
+
     public function login(Request $request): string
     {
+
         //Если просто обращение к странице, то отобразить форму
         if ($request->method === 'GET') {
             return new View('site.login');
+        }
+
+        if ($request->method === 'POST') {
+            $validator = new Validator($request->all(), [
+                'login' => ['required'],
+                'password' => ['required']
+            ], [
+                'required' => 'Поле :field пусто',
+            ]);
+
+            if($validator->fails()){
+                return new View('site.login',
+                    ['message' => json_encode($validator->errors(), JSON_UNESCAPED_UNICODE)]);
+            }
         }
         //Если удалось аутентифицировать пользователя, то редирект
         if (Auth::attempt($request->all())) {
@@ -51,7 +132,7 @@ class Site
     public function logout(): void
     {
         Auth::logout();
-        app()->route->redirect('/hello');
+        app()->route->redirect('/login');
     }
 
     public function home(): string
@@ -63,6 +144,60 @@ class Site
     {
         $services = Service::all();
         return (new View())->render('site.services', ['services' => $services]);
+    }
+
+    public function addService(Request $request): string
+    {
+        if ($request->method === 'POST') {
+            $validator = new Validator($request->all(), [
+                'name' => ['required', 'unique:services,name', 'russianLanguage'],
+                'cost' => ['positive']
+            ], [
+                'required' => 'Поле :field пусто',
+                'unique' => 'Поле :field должно быть уникально',
+                'positive' => 'Поле :field должно быть положительным числом',
+                'russianLanguage' => 'Поле :field должно содержать только русские буквы',
+            ]);
+
+            if($validator->fails()){
+                return new View('site.addService',
+                    ['message' => json_encode($validator->errors(), JSON_UNESCAPED_UNICODE)]);
+            }
+        }
+        if ($request->method==='POST' && Service::create($request->all())){
+            app()->route->redirect('/services');
+        }
+        return new View('site.addService');
+    }
+
+    public function patients(Request $request): string
+    {
+        $users = [];
+        $patients = Patient::all();
+        foreach ($patients as $patient) {
+            $user = User::find($patient->id);
+            array_push($users, $user);
+        }
+        return (new View())->render('site.patients', ['patients' => $users]);
+    }
+
+    public function doctors(Request $request): string
+    {
+        $users = [];
+        $doctors = Doctor::all();
+        foreach ($doctors as $doctor) {
+            $user = User::find($doctor->id);
+            $user->position = $doctor->position;
+            $user->specialization = $doctor->specialization;
+            array_push($users, $user);
+        }
+        return (new View())->render('site.doctors', ['doctors' => $users]);
+    }
+
+    public function diagnosis(Request $request): string
+    {
+        $diagnosis = Diagnosis::all();
+        return (new View())->render('site.diagnosis', ['diagnosis' => $diagnosis]);
     }
 
     public function signupservice(): string
@@ -85,7 +220,7 @@ class Site
 
     public function patient_appointments(Request $request): string
     {
-        $patient = Patient::find($request->id);
+        $patient = Patient::find((int) $request->id);
 
         return (new View())->render('site.patientsAppointments', ['patient' => $patient]);
     }

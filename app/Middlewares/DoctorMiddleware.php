@@ -11,11 +11,11 @@ class DoctorMiddleware
     public function handle(Request $request)
     {
         if (!Auth::check()) {
-            app()->route->redirect('/login');
+            app()->route->redirect('/');
         }
         if(!Auth::user()->isDoctor())
         {
-            app()->route->redirect('/login');
+            app()->route->redirect('/');
         }
     }
 }

@@ -26,6 +26,19 @@
 
 ";
         }
+        else {
+            echo "
+    
+     <div class='card text-bg-danger mb-3'>
+        <div class='card-header'>$newformat</div>
+        <div class='card-body'>
+             <h5 class='card-title'>Пациент: {$user->name} {$user->surname} {$user->patronymic}</h5>
+             <p>Прошедшая запись</p>
+        </div>
+    </div>
+
+";
+        }
 
     }
     ?>

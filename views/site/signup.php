@@ -1,12 +1,19 @@
 <div>
     <h1 class="text-center" style="margin-bottom: 100px">Регистрация</h1>
-    <h3><?= $message ?? ''; ?></h3>
+    <p style="color: red"><?php echo $message  ?? ''; ?></p>
+
+
 
 
     <form method="post">
+        <input name="csrf_token" type="hidden" value="<?= app()->auth::generateCSRF() ?>"/>
+
         <div class="mb-3">
             <label for="login" class="form-label">Логин</label>
             <input type="text" name="login" class="form-control" id="login" aria-describedby="emailHelp" required>
+            <div class="invalid-feedback">
+                Please enter a message in the textarea.
+            </div>
             <div id="emailHelp" class="form-text">Введите логин</div>
         </div>
 
@@ -30,7 +37,7 @@
 
         <div class="mb-3">
             <label for="login" class="form-label">Дата рождения</label>
-            <input type="date" max="<?php echo date(""); ?>" name="birthday" class="form-control" id="patronymic" aria-describedby="emailHelp" required>
+            <input type="date" max="<?php echo date("Y-m-d"); ?>" name="birthday" class="form-control" id="patronymic" aria-describedby="emailHelp" required>
             <div id="emailHelp" class="form-text">Введите дату своего рождения</div>
         </div>
 

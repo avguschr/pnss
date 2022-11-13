@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js" integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <title>Pop it MVC</title>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -22,6 +23,9 @@
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" aria-current="page" href="<?= app()->route->getUrl('/') ?>">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="<?= app()->route->getUrl('/services') ?>">Услуги</a>
                     </li>
                     <?php
                     if (!app()->auth::check()):
@@ -38,22 +42,37 @@
                     <li class="nav-item">
                         <a class="nav-link" href="<?= app()->route->getUrl('/logout') ?>">Выход</a>
                     </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?= app()->route->getUrl('/my-appointments') ?>">Мои записи</a>
-                            </li>
+                    <?php
+                    if (app()->auth::user()->role === 1):
+                        ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= app()->route->getUrl('/patients') ?>">Пациенты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= app()->route->getUrl('/doctors') ?>">Врачи</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= app()->route->getUrl('/all-diagnosis') ?>">Диагнозы</a>
+                        </li>
+                    <?php
+                    else:
+                    ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= app()->route->getUrl('/my-appointments') ?>">Мои записи</a>
+                        </li>
+                    <?php
+                    endif;
+                            ?>
                         <?php
                     endif;
                     ?>
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="<?= app()->route->getUrl('/services') ?>">Услуги</a>
-                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 </header>
 <main style="margin-bottom: 250px">
-    <div class="container">
+    <div class="container" id="app">
         <?= $content ?? '' ?>
     </div>
 </main>
@@ -84,5 +103,14 @@
         src="https://kit.fontawesome.com/f5e9404b16.js"
         crossorigin="anonymous"
 ></script>
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            showDataInput: false,
+            date: '',
+        }
+    })
+</script>
 </body>
 </html>
